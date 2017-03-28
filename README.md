@@ -7,7 +7,9 @@ OpenStack Swift Qt  Client
     //upload_file(ret_token_message,"photos","testfolder");
     //get_file_property(ret_token_message,"photos","testfolder/svn使用方法.docx");
     //delete_file(ret_token_message,"photos","testfolder/svn使用方法.docx");
-    download_file(ret_token_message,"photos","testfolder/svn使用方法.docx","我的测试文档.docx","C:/Users/ss/Desktop");
+    //download_file(ret_token_message,"photos","testfolder/svn使用方法.docx","我的测试文档.docx","C:/Users/ss/Desktop");
+    //make_folder(ret_token_message,"photos","testfolder01");
+    //create_bucket(ret_token_message,"bucketname02");
 ```
 
 
