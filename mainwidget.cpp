@@ -118,7 +118,6 @@ void MainWidget::slot_swift_list_bucket_success(QMap<QString,QString> *header_pa
     //upload_file(ret_token_message,"photos","testfolder");
     //get_file_property(ret_token_message,"photos","testfolder/svn使用方法.docx");
     //delete_file(ret_token_message,"photos","testfolder/svn使用方法.docx");
-    //testfolder/svn使用方法.docx
     download_file(ret_token_message,"photos","testfolder/svn使用方法.docx","我的测试文档.docx","C:/Users/ss/Desktop");
 
 }
@@ -392,12 +391,110 @@ void MainWidget::slot_swift_download_file_error(QString error_message){
     qDebug() << Q_FUNC_INFO << "error_message is "<<error_message;
 }
 
+
+
+void MainWidget::create_bucket(QMap<QString,QString> * header_pair,
+                               QString bucketname){
+
+    if(NULL==swiftmakebucketthread){
+        swiftmakebucketthread =   new QThread();
+    }
+    if(NULL==swift_make_bucket){
+        swift_make_bucket = new Swift_Make_Bucket(header_pair,bucketname);
+        connect(this, SIGNAL(signal_swift_make_bucket()),
+                swift_make_bucket, SLOT(slot_swift_make_bucket()));
+        connect(this, SIGNAL(signal_swift_make_bucket(QMap<QString,QString> *,
+                                                        QString)),
+                swift_make_bucket, SLOT(slot_swift_make_bucket(QMap<QString,QString> *,QString
+                                                                    )));
+        connect(swift_make_bucket, SIGNAL(
+                    signal_swift_make_bucket_success(QMap<QString,QString> *)),
+                this, SLOT(
+                    slot_swift_make_bucket_success(QMap<QString,QString> *)));
+        connect(swift_make_bucket, SIGNAL(signal_swift_make_bucket_error(QString)),
+                this, SLOT(slot_swift_make_bucket_error(QString)));
+
+
+        swift_make_bucket->DoSetup(*swiftmakebucketthread);
+        swift_make_bucket->moveToThread(swiftmakebucketthread);
+
+
+    }
+    if (!swiftmakebucketthread->isRunning()) {
+        swiftmakebucketthread->start();
+    }
+    else {
+        emit signal_swift_make_bucket(header_pair,
+                                        bucketname);
+    }
+
+}
+
 void MainWidget::delete_bucket(){
 
 }
 
-void MainWidget::create_bucket(){
 
+
+
+void MainWidget::slot_swift_make_bucket_success(QMap<QString,QString> * ret_message){
+    qDebug() << Q_FUNC_INFO << " in slot_swift_make_bucket_success ";
+}
+
+void MainWidget::slot_swift_make_bucket_error(QString error_message){
+    qDebug() << Q_FUNC_INFO << " error_message is "<<error_message;
+}
+
+
+
+void MainWidget::make_folder(QMap<QString,QString> * header_pair,
+                             QString bucketname,
+                             QString foldername){
+
+
+    if(NULL==swiftmakefolderthread){
+        swiftmakefolderthread =   new QThread();
+    }
+
+    if(NULL==swift_make_folder){
+        swift_make_folder = new Swift_Make_Folder(header_pair,bucketname,foldername);
+        connect(this, SIGNAL(signal_swift_make_folder()),
+                swift_make_folder, SLOT(slot_swift_make_folder()));
+        connect(this, SIGNAL(signal_swift_make_folder(QMap<QString,QString> *,
+                                                      QString,
+                                                      QString)),
+                swift_make_folder, SLOT(slot_swift_make_folder(QMap<QString,QString> *,
+                                                               QString,
+                                                               QString)));
+        connect(swift_make_folder, SIGNAL(
+                    signal_swift_make_folder_success(QMap<QString,QString> *)),
+                this, SLOT(
+                    slot_swift_make_folder_success(QMap<QString,QString> *)));
+        connect(swift_make_folder, SIGNAL(signal_swift_make_folder_error(QString)),
+                this, SLOT(slot_swift_make_folder_error(QString)));
+
+
+        swift_make_folder->DoSetup(*swiftmakefolderthread);
+        swift_make_folder->moveToThread(swiftmakefolderthread);
+
+
+    }
+    if (!swiftmakefolderthread->isRunning()) {
+        swiftmakefolderthread->start();
+    }
+    else {
+        emit signal_swift_make_folder(header_pair,bucketname,foldername);
+    }
+
+}
+
+
+void MainWidget::slot_swift_make_folder_success(QMap<QString,QString> * ret_message){
+    qDebug() << Q_FUNC_INFO << " in slot_swift_make_folder_success ";
+}
+
+void MainWidget::slot_swift_make_folder_error(QString error_message){
+    qDebug() << Q_FUNC_INFO << " error_message is "<<error_message;
 }
 
 MainWidget::~MainWidget()
@@ -493,6 +590,18 @@ MainWidget::~MainWidget()
         swiftdownloadfilethread->wait();
     }
 
+
+    if(NULL!=swift_make_bucket){
+        qDebug() << Q_FUNC_INFO << "delete swift_make_bucket";
+        delete swift_make_bucket;
+        swift_make_bucket = NULL;
+    }
+
+    if (NULL != swiftmakebucketthread&&swiftmakebucketthread->isRunning()) {
+        qDebug() << Q_FUNC_INFO << "quit swiftdownloadfilethread";
+        swiftmakebucketthread->quit();
+        swiftmakebucketthread->wait();
+    }
 
     delete ui;
 }

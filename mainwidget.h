@@ -52,7 +52,11 @@ public:
                        QString savepath);
 
     void delete_bucket();
-    void create_bucket();
+    void create_bucket(QMap<QString,QString> * header_pair,
+                       QString bucketname);
+    void make_folder(QMap<QString,QString> * header_pair,
+                     QString bucketname,
+                     QString foldername);
 
 signals:
     void signal_swift_token_get();
@@ -80,6 +84,13 @@ signals:
     void signal_swift_download_file();
     void signal_swift_download_file(QMap<QString,QString> *,QString,QString,QString,QString);
 
+    void signal_swift_make_bucket();
+    void signal_swift_make_bucket(QMap<QString,QString> *,QString);
+
+
+    void signal_swift_make_folder();
+    void signal_swift_make_folder(QMap<QString,QString> *,QString,QString);
+
 public slots:
     void slot_swift_token_get_success(QMap<QString,QString> *);
     void slot_swift_token_get_error(QString);
@@ -106,6 +117,13 @@ public slots:
 
     void slot_swift_download_file_success(QMap<QString,QString> *);
     void slot_swift_download_file_error(QString);
+
+    void slot_swift_make_bucket_success(QMap<QString,QString> *);
+    void slot_swift_make_bucket_error(QString);
+
+
+    void slot_swift_make_folder_success(QMap<QString,QString> *);
+    void slot_swift_make_folder_error(QString);
 
 private:
     Ui::MainWidget *ui;
@@ -141,6 +159,16 @@ private:
 
     Swift_Download_File *swift_download_file {swift_download_file= NULL};
     QThread *swiftdownloadfilethread{swiftdownloadfilethread=NULL};
+
+
+
+    Swift_Make_Bucket *swift_make_bucket {swift_make_bucket= NULL};
+    QThread *swiftmakebucketthread{swiftmakebucketthread=NULL};
+
+
+
+    Swift_Make_Folder *swift_make_folder {swift_make_folder= NULL};
+    QThread *swiftmakefolderthread{swiftmakefolderthread=NULL};
 
 };
 
